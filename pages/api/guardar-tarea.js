@@ -1,11 +1,4 @@
-import mysql from 'mysql';
-
-const connection = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: '',
-  database: 'todolist'
-});
+import db from '../../lib/db';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -14,13 +7,11 @@ export default async function handler(req, res) {
 
   const { titulo, descripcion } = req.body;
 
-  const query = 'INSERT INTO tareas (titulo, descripcion) VALUES (?, ?)';
-  connection.query(query, [titulo, descripcion], (error, results) => {
-    if (error) {
-      console.error(error);
-      res.status(500).json({ message: 'Error al guardar la tarea' });
-    } else {
-      res.status(200).json({ message: 'Tarea guardada exitosamente' });
-    }
-  });
+  try {
+    const [results] = await db.query('INSERT INTO tareas (titulo, descripcion) VALUES (?, ?)', [titulo, descripcion]);
+    res.status(200).json({ message: 'Tarea guardada exitosamente', id: results.insertId });
+  } catch (error) {
+    console.error('Error al guardar la tarea:', error);
+    res.status(500).json({ message: 'Error al guardar la tarea' });
+  }
 }
