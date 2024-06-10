@@ -2,59 +2,20 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios'; // Para realizar solicitudes HTTP
 import styled from 'styled-components';
 import 'bootstrap/dist/css/bootstrap.min.css';
-
-// Estilos para el cuerpo de la página
-const Body = styled.div`
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  background-color: lightgray; 
-`;
-
-// Componente para el botón de Bootstrap
-const StyledButton = styled.button`
-  display: block;
-  // margin: 0 auto 20px; /* Margen inferior de 20px y centrado horizontal */
-`;
-
-// Contenedor para los botones
-const ButtonContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-  gap: 0.5rem; /* Espaciado entre los botones */
-`;
-
-// Contenedor para los botones superiores
-const ButtonsContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 80%; 
-  margin: 0 auto;
-  margin-bottom: 0.5rem;
-`;
-
-const FilterSelect = styled.select`
-  width: 150px; /* Ancho del select */
-`;
-
-// Estilos para el título centrado
-const Title = styled.h1`
-text-align: center;
-`;
-
-// Componente para la tabla de Bootstrap
-const BootstrapTable = styled.table`
-width: 80%; 
-margin: 0 auto; 
-`;
-
-// Estilos para el footer centrado en la parte inferior de la página
-const Footer = styled.footer`
-text-align: center;
-margin-top: auto; /* Mueve el footer al final de la página */
-background-color: white; 
-`;
+import 'react-confirm-alert/src/react-confirm-alert.css'; // Importar CSS de react-confirm-alert
+import { confirmAlert } from 'react-confirm-alert';
+import { 
+  Body, 
+  FixedAlert, 
+  StyledButton, 
+  ButtonContainer, 
+  ButtonsContainer, 
+  FilterSelect, 
+  Title, 
+  BootstrapTable, 
+  TableContainer, 
+  Footer 
+} from '../styles/styles'; // Importar estilos desde styles.js
 
 const BtnAgregarTarea = ({ onClick }) => {
   return (
@@ -63,34 +24,31 @@ const BtnAgregarTarea = ({ onClick }) => {
     </div>
   );
 };
+
+
 const Home = () => {
   
   const [modalOpen, setModalOpen] = useState(false);
   const [titulo, setTitulo] = useState('');
   const [descripcion, setDescripcion] = useState('');
-  const [estado, setEstado] = useState('pendiente');
-  
+  const [estado, setEstado] = useState('pendiente');  
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const [tareas, setTareas] = useState([]);
-  
+  const [tareas, setTareas] = useState([]);  
   const [isEditing, setIsEditing] = useState(false);
-  const [editId, setEditId] = useState(null);    
-  
+  const [editId, setEditId] = useState(null);  
   const [selectedValue, setSelectedValue] = useState('todo');
 
   const handleChange = async (event) => {
     const value = event.target.value; // Obtener el valor seleccionado del evento
     setSelectedValue(value); // Actualizar el valor seleccionado en el estado
     try {
-      // Hacer una solicitud GET a la API con el valor seleccionado como parámetro de consulta
       const response = await axios.get(`/api/tareas?estado=${value}`);
       setTareas(response.data); // Actualizar el estado de las tareas con los datos recibidos
       } catch (error) {
       console.error('Error al hacer la solicitud:', error);
     }
   };
-
 
   useEffect(() => {
     // Realizar una solicitud GET inicial para obtener todas las tareas
@@ -102,16 +60,12 @@ const Home = () => {
         console.error('Error al obtener las tareas:', error);
       }
     };
-
     fetchTareas(); // Llamar a la función al cargar el componente
   }, []); // La dependencia vacía asegura que esta solicitud solo se realice una vez al montar el componente
-
   
   const toggleModal = () => {
     setModalOpen(!modalOpen);
   };
-
-
 
 
   const handleSubmit = async (event) => {
@@ -121,7 +75,7 @@ const Home = () => {
       return;
     } else {
 
-      // Condicional para reutilizar el modal de agregado
+      // Condicional para reutilizar el formulario dentro del modal
       if (isEditing) {
         try {
           await axios.put(`/api/tareas/editar/${editId}`, { titulo, descripcion, estado });
@@ -155,18 +109,37 @@ const Home = () => {
   } // final del handleSubmit
 
 
-    const completarTarea = async (id, selectedValue) => {
-      try {
-        await axios.patch(`/api/tareas/completar/${id}`);
-        const response = await axios.get(`/api/tareas?estado=${selectedValue}`);
-        setTareas(response.data);
-        setSuccess('Tarea marcada como finalizada correctamente');
-        setTimeout(() => {
-               setSuccess('');
-             }, 2000);
-      } catch (error) {
-        console.error('Error completing task:', error);
-      }
+  const completarTarea = async (id, estado, selectedValue) => {
+    if (estado === 'completada') {
+      setSuccess('Esta tarea ya está completada');
+      setTimeout(() => { setSuccess(''); }, 2000);
+      return;
+    }
+    
+    confirmAlert({
+        title: 'Completar tarea',
+        message: '¿Estás seguro de que quieres marcar esta tarea como completada?',
+        buttons: [
+          {
+            label: 'Sí',
+            onClick: async () => {
+              try {
+                await axios.patch(`/api/tareas/completar/${id}`);
+                const response = await axios.get(`/api/tareas?estado=${selectedValue}`);
+                setTareas(response.data);
+                setSuccess('Tarea marcada como completada correctamente');
+                setTimeout(() => { setSuccess(''); }, 2000);
+              } catch (error) {
+                console.error('Error completing task:', error);
+              }
+            }
+          },
+          {
+            label: 'No',
+            onClick: () => {}
+          }
+        ]
+      });
     };
   
     const editTarea = (id) => {
@@ -179,27 +152,40 @@ const Home = () => {
       toggleModal();
     };
 
-    const eliminarTarea = async (id) => {
-      try {
-        await axios.delete(`/api/tareas/eliminar/${id}`);
-        // Aquí actualizamos las tareas después de eliminar una
-        const response = await axios.get(`/api/tareas?estado=${selectedValue}`);
-        setTareas(response.data);
-        setSuccess('Tarea eliminada con éxito');
-        setTimeout(() => {
-          setSuccess('');
-        }, 2000); 
-      } catch (error) {
-        console.error('Error deleting task:', error);
-      }
+    const eliminarTarea = async (id, selectedValue) => {
+      confirmAlert({
+        title: 'Eliminar tarea',
+        message: '¿Estás seguro de que quieres eliminar esta tarea?',
+        buttons: [
+          {
+            label: 'Sí',
+            onClick: async () => {
+              try {
+                await axios.delete(`/api/tareas/eliminar/${id}`);
+                const response = await axios.get(`/api/tareas?estado=${selectedValue}`);
+                setTareas(response.data);
+                setSuccess('Tarea eliminada con éxito');
+                setTimeout(() => { setSuccess(''); }, 2000); 
+              } catch (error) {
+                console.error('Error deleting task:', error);
+              }
+            }
+          },
+          {
+            label: 'No',
+            onClick: () => {}
+          }
+        ]
+      });
     };
-
-
-
 
   return (    
     <Body>
-      {success && <div className="alert alert-success" role="alert">{success}</div>}
+  {success && (
+      <FixedAlert className="alert alert-success" role="alert">
+        {success}
+      </FixedAlert>
+    )}
 
       <Title>To-Do List</Title>
       <ButtonsContainer>
@@ -221,7 +207,8 @@ const Home = () => {
           </FilterSelect>
         </div>
       </ButtonsContainer>
-      
+
+      <TableContainer>      
       <BootstrapTable className="table table-bordered text-center">
         <thead>
           <tr>
@@ -245,7 +232,7 @@ const Home = () => {
               </td>
               <td>
                 <ButtonContainer>
-                  <button className="btn btn-success btn-sm" onClick={() => completarTarea(tarea.id,selectedValue)}>
+                  <button button className="btn btn-success btn-sm" onClick={() => completarTarea(tarea.id, tarea.estado, selectedValue)}>
                     <i className="bi bi-check-circle"></i>
                   </button>
                   <button className="btn btn-warning btn-sm" onClick={() => editTarea(tarea.id,selectedValue)}>
@@ -260,6 +247,7 @@ const Home = () => {
           ))}
         </tbody>
       </BootstrapTable>
+      </TableContainer>
 
 
       {modalOpen && (
