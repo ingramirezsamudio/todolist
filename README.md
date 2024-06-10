@@ -1,40 +1,40 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# To-Do List App
 
-## Getting Started
+Esta es una aplicación simple de lista de tareas desarrollada con React y Next.js. Permite a los usuarios agregar, editar, completar y eliminar tareas, así como filtrarlas por su estado.
 
-First, run the development server:
+## Características
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- Agregar nuevas tareas con un título y una descripción.
+- Editar tareas existentes.
+- Marcar tareas como completadas.
+- Eliminar tareas.
+- Filtrar tareas por estado (pendiente, en proceso, completada).
+- Interfaz de usuario intuitiva y fácil de usar.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Tecnologías Utilizadas
 
-You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
+- React: Biblioteca JavaScript para construir interfaces de usuario.
+- Next.js: Framework de React para aplicaciones web rápidas y escalables.
+- Axios: Cliente HTTP basado en promesas para realizar solicitudes a la API.
+- Styled Components: Biblioteca para escribir estilos CSS en JavaScript.
+- Bootstrap: Framework CSS para el diseño y la interfaz de usuario.
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.js`.
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+## Instalación
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+- Clona este repositorio en tu máquina local usando Git: `git clone https://github.com/ingramirezsamudio/todolist.git`
+- Navega al directorio del proyecto: `cd todolist`
+- Instala las dependencias del proyecto: `npm install`
+- Ejecuta el script de MySQL para crear la base de datos y la tabla necesaria, el cual está ubicado en: `database_scripts\mysql_scripts.sql`
 
-## Learn More
+## Uso
 
-To learn more about Next.js, take a look at the following resources:
+- Inicia la aplicación en modo de desarrollo: `npm run dev`
+- Abre tu navegador web y ve a `http://localhost:3000` para ver la aplicación.
+- Empieza a agregar, editar, completar o eliminar tareas según tus necesidades.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Contribución
+¡Las contribuciones son bienvenidas! Si tienes ideas para mejorar esta aplicación, por favor crea una nueva solicitud de extracción o abre un nuevo problema para discutir tus ideas.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+## Licencia
+Este proyecto está bajo la Licencia MIT.
